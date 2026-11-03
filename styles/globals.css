@@ -1,0 +1,162 @@
+@import "tailwindcss";
+
+/*
+  SALHEN · "Bitácora técnica"
+  Layout: retícula de 12 columnas sobre papel mineral; cada sección es una lámina del
+  expediente técnico de una propiedad (planos de línea, códigos de servicio, datos en mono).
+  Colores oficiales del manual corporativo: #93ac25, #ccd625, #687c19, #5f5f5f, #8c8987.
+*/
+@theme {
+  --color-paper: #eeefea;
+  --color-paper-2: #e2e4dc;
+  --color-ink: #1a1c18;
+  --color-ink-2: #464a42;
+  --color-stone: #8c8987;
+  --color-line: #c6c9be;
+  --color-graphite: #1f221d;
+  --color-graphite-2: #2b2f28;
+  --color-graphite-line: #41463c;
+  --color-mist: #c9ccc3;
+  --color-olive: #687c19;
+  --color-olive-ink: #4c5a10;
+  --color-green: #93ac25;
+  --color-lime: #ccd625;
+  --color-danger: #a3321f;
+  --color-danger-soft: #f3d9d2;
+
+  --font-display: var(--font-saira), "Arial Narrow", "Roboto Condensed", sans-serif;
+  --font-sans: var(--font-plex), "Segoe UI", system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, "Cascadia Mono", Consolas, monospace;
+
+  --text-mega: clamp(2.6rem, 6vw, 5rem);
+  --text-display: clamp(1.9rem, 3.2vw, 2.8rem);
+  --text-title: clamp(1.8rem, 3vw, 2.6rem);
+
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-in-out-quint: cubic-bezier(0.83, 0, 0.17, 1);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    scroll-padding-top: 5rem;
+  }
+  /* Escala general más contenida en pantallas grandes: todo lo medido en rem se reduce junto.
+     Los breakpoints no cambian (las media queries usan el tamaño por defecto del navegador). */
+  @media (min-width: 64rem) {
+    html { font-size: 90%; }
+  }
+  body {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: clip;
+  }
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    text-wrap: balance;
+    line-height: 0.95;
+    letter-spacing: -0.005em;
+  }
+  p { text-wrap: pretty; }
+  ::selection { background: var(--color-lime); color: var(--color-ink); }
+  :focus-visible {
+    outline: 2px solid var(--color-olive);
+    outline-offset: 3px;
+    border-radius: 1px;
+  }
+  .on-dark :focus-visible { outline-color: var(--color-lime); }
+}
+
+@layer components {
+  /* Contenedor con márgenes laterales amplios (20px mínimo) y ancho máximo contenido */
+  .shell {
+    width: 100%;
+    max-width: 84rem;
+    margin-inline: auto;
+    padding-left: max(1.25rem, env(safe-area-inset-left, 0px));
+    padding-right: max(1.25rem, env(safe-area-inset-right, 0px));
+  }
+  @media (min-width: 48rem) {
+    .shell {
+      padding-left: max(3rem, env(safe-area-inset-left, 0px));
+      padding-right: max(3rem, env(safe-area-inset-right, 0px));
+    }
+  }
+  @media (min-width: 80rem) {
+    .shell {
+      padding-left: max(5rem, env(safe-area-inset-left, 0px));
+      padding-right: max(5rem, env(safe-area-inset-right, 0px));
+    }
+  }
+  .grid-12 {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    column-gap: 1rem;
+  }
+  @media (min-width: 64rem) {
+    .grid-12 { grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 1.5rem; }
+  }
+
+  /* Etiqueta técnica en mono */
+  .label {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    line-height: 1.4;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* Papel de plano: retícula constructiva muy tenue */
+  .blueprint {
+    background-image:
+      linear-gradient(to right, color-mix(in oklab, var(--color-ink) 6%, transparent) 1px, transparent 1px),
+      linear-gradient(to bottom, color-mix(in oklab, var(--color-ink) 6%, transparent) 1px, transparent 1px);
+    background-size: 6rem 6rem;
+    background-position: -1px -1px;
+  }
+  .blueprint-dark {
+    background-image:
+      linear-gradient(to right, color-mix(in oklab, var(--color-paper) 5%, transparent) 1px, transparent 1px),
+      linear-gradient(to bottom, color-mix(in oklab, var(--color-paper) 5%, transparent) 1px, transparent 1px);
+    background-size: 6rem 6rem;
+  }
+
+  .prose-measure { max-width: 34rem; }
+}
+
+/* Trazado progresivo de líneas en los dibujos técnicos */
+@keyframes draw {
+  to { stroke-dashoffset: 0; }
+}
+@keyframes pulse-ring {
+  0% { transform: scale(0.6); opacity: 0.9; }
+  100% { transform: scale(2.4); opacity: 0; }
+}
+.draw-line {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: draw 1.8s var(--ease-out-quart) forwards;
+  animation-delay: var(--delay, 0s);
+}
+.marker-ring {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pulse-ring 2.4s ease-out infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .draw-line { animation: none; stroke-dashoffset: 0; }
+  .marker-ring { animation: none; opacity: 0; }
+  *, *::before, *::after {
+    transition-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
