@@ -43,13 +43,13 @@ export function Header() {
       <motion.header
         animate={{ y: hidden ? "-100%" : "0%" }}
         transition={{ duration: 0.45, ease: [0.25, 1, 0.5, 1] }}
-        className={`fixed inset-x-0 top-0 z-40 pt-[env(safe-area-inset-top,0px)] transition-[background-color,border-color] duration-300 ${
+        className={`fixed inset-x-0 top-0 z-40 pt-[calc(env(safe-area-inset-top,0px)+0.75rem)] pb-2 lg:pt-[calc(env(safe-area-inset-top,0px)+1.25rem)] transition-[background-color,border-color] duration-300 ${
           solid && !open ? "border-b border-line bg-paper/92 backdrop-blur-md" : "border-b border-transparent"
         }`}
       >
-        <div className="shell flex h-18 items-center justify-between gap-6">
-          <Link href="/" className="relative z-50 shrink-0" aria-label="SALHEN, ir al inicio" onClick={() => setOpen(false)}>
-            <Logo className="h-9 sm:h-11" priority />
+        <div className="shell grid h-18 grid-cols-[1fr_auto] items-center gap-6 xl:grid-cols-[1fr_auto_1fr]">
+          <Link href="/" className="relative z-50 shrink-0 justify-self-start" aria-label="SALHEN, ir al inicio" onClick={() => setOpen(false)}>
+            <Logo className="h-8 sm:h-10" priority />
           </Link>
 
           <nav aria-label="Principal" className="hidden xl:block">
@@ -67,7 +67,7 @@ export function Header() {
             </ul>
           </nav>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 justify-self-end">
             <div className="hidden sm:block">
               <ButtonLink href="/#cotizar" variant="lime" className="min-h-11 px-5 text-[0.95rem]">
                 Solicitar cotización
@@ -102,7 +102,7 @@ export function Header() {
             role="dialog"
             aria-modal="true"
             aria-label="Menú"
-            className="blueprint fixed inset-0 z-30 overflow-y-auto bg-paper pt-[calc(env(safe-area-inset-top,0px)+5.5rem)] pb-[max(2rem,env(safe-area-inset-bottom,0px))] xl:hidden"
+            className="blueprint fixed inset-0 z-30 overflow-y-auto bg-paper pt-[calc(env(safe-area-inset-top,0px)+6.5rem)] pb-[max(2rem,env(safe-area-inset-bottom,0px))] xl:hidden"
             initial={{ clipPath: "inset(0 0 100% 0)" }}
             animate={{ clipPath: "inset(0 0 0% 0)" }}
             exit={{ clipPath: "inset(0 0 100% 0)" }}

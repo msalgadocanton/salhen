@@ -1,16 +1,16 @@
 import { siteConfig } from "@/lib/site";
 import { ButtonLink } from "@/components/ui/Button";
 import { Reveal } from "@/components/ui/Reveal";
-import { HeroDrawing } from "./HeroDrawing";
-import { heroMarkers } from "./heroMarkers";
+import { HeroShowcase } from "./HeroShowcase";
 import { HeroTitle } from "./HeroTitle";
 
 // Dos columnas simétricas en escritorio: el texto define la altura y el croquis la ocupa
 // completa, de modo que el titular arranca a la altura de la cubierta y los botones cierran
-// a la altura del terreno.
+// a la altura del terreno. Debajo, a todo el ancho, el selector de servicios del croquis
+// (HeroShowcase envuelve la grilla porque comparte el servicio activo entre ambos).
 export function Hero() {
   return (
-    <section aria-labelledby="hero-heading" className="blueprint relative overflow-hidden pt-[calc(env(safe-area-inset-top,0px)+6.5rem)] lg:pt-36">
+    <section aria-labelledby="hero-heading" className="blueprint relative overflow-hidden pt-[calc(env(safe-area-inset-top,0px)+7.5rem)] lg:pt-40">
       <div className="shell">
         <div className="label mb-8 flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-b border-line pb-4 text-ink-2 lg:mb-14">
           <p>Mantención · Reparación · Soluciones constructivas</p>
@@ -20,7 +20,7 @@ export function Hero() {
           </p>
         </div>
 
-        <div className="grid-12 gap-y-12">
+        <HeroShowcase>
           <div className="col-span-4 flex flex-col justify-between gap-10 lg:col-span-6">
             <HeroTitle />
             <Reveal delay={0.5} className="flex flex-col gap-7">
@@ -40,21 +40,7 @@ export function Hero() {
               </div>
             </Reveal>
           </div>
-
-          <div className="relative col-span-4 lg:col-span-6">
-            <HeroDrawing />
-            <ul className="mt-4 grid grid-cols-1 gap-2 sm:hidden">
-              {heroMarkers.map((m) => (
-                <li key={m.code} className="label flex gap-3 text-ink-2">
-                  <span className="text-olive-ink">{m.code}</span>
-                  {m.label}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-
-        <p className="label mt-6 text-right text-stone">Ilustración técnica de referencia</p>
+        </HeroShowcase>
       </div>
 
       <div className="mt-10 border-t-4 border-lime bg-paper/70">

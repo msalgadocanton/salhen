@@ -2,6 +2,7 @@ import { pillars } from "@/data/content";
 import { services } from "@/data/services";
 import { Reveal } from "@/components/ui/Reveal";
 import { SectionHead } from "@/components/ui/SectionHead";
+import { Logo } from "@/components/layout/Logo";
 
 export function ValueProposition() {
   return (
@@ -32,7 +33,7 @@ export function ValueProposition() {
             <div className="relative pr-4 sm:pr-6">
               <div className="border-b-4 border-lime bg-ink px-3 py-4 text-paper sm:px-4 sm:py-5">
                 <p className="label text-[0.65rem] text-lime sm:text-xs">Tú hablas con</p>
-                <p className="mt-1 font-display text-[1.3rem] font-bold uppercase leading-none tracking-wide sm:text-[1.9rem]">SALHEN</p>
+                <Logo variant="verticalBlanco" className="mt-3 h-12 max-w-full sm:h-[4.5rem]" />
               </div>
               <span aria-hidden="true" className="absolute right-0 top-1/2 h-px w-4 bg-ink sm:w-6" />
             </div>

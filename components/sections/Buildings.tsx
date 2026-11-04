@@ -1,8 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion, type Variants } from "motion/react";
+import { useMemo, useState, type RefObject } from "react";
+import { AnimatePresence, motion, useReducedMotion, useScroll, useTransform, type Variants } from "motion/react";
 import { useAmbientMotion } from "@/components/motion/useAmbientMotion";
+import { useSvgPointer } from "@/components/motion/useSvgPointer";
+import { Crosshair } from "@/components/motion/Crosshair";
 import { buildingCapabilities, type BuildingZone } from "@/data/content";
 import { ButtonLink } from "@/components/ui/Button";
 import { SectionHead } from "@/components/ui/SectionHead";
@@ -30,32 +32,87 @@ function useDrawVariants(instant: boolean) {
   }, [instant]);
 }
 
-// Zona destacada: entra con un destello y queda en un relleno suave.
-function Zone({ zone, active, ...rect }: { zone: BuildingZone; active: BuildingZone; x: number; y: number; width: number; height: number }) {
+// Zona destacada: entra con un destello y un barrido de escaneo, queda con relleno suave y un
+// borde punteado en marcha. Con mouse, pasar sobre una zona del corte la selecciona.
+function Zone({
+  zone,
+  active,
+  ambient,
+  onPick,
+  ...rect
+}: {
+  zone: BuildingZone;
+  active: BuildingZone;
+  ambient: boolean;
+  onPick: (zone: BuildingZone) => void;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}) {
   const on = active === zone || active === "all";
+  const vertical = rect.height > rect.width;
   return (
-    <motion.rect
-      {...rect}
-      fill="var(--color-lime)"
-      stroke="var(--color-lime)"
-      strokeWidth="1.25"
-      initial={false}
-      animate={on ? { fillOpacity: [0.5, 0.22], strokeOpacity: 1 } : { fillOpacity: 0, strokeOpacity: 0 }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
-    />
+    <g onPointerEnter={(e) => e.pointerType === "mouse" && onPick(zone)} onClick={() => onPick(zone)} className="cursor-pointer">
+      <motion.rect
+        {...rect}
+        fill="var(--color-lime)"
+        initial={false}
+        animate={on ? { fillOpacity: [0.65, 0.22] } : { fillOpacity: 0 }}
+        transition={{ duration: 0.7, ease: "easeOut" }}
+      />
+      <motion.rect
+        {...rect}
+        fill="none"
+        stroke="var(--color-lime)"
+        strokeWidth="1.5"
+        strokeDasharray="6 4"
+        initial={false}
+        animate={on ? { strokeOpacity: 1, strokeDashoffset: ambient ? [0, -20] : 0 } : { strokeOpacity: 0, strokeDashoffset: 0 }}
+        transition={{ strokeOpacity: { duration: 0.3 }, strokeDashoffset: { duration: 0.8, ease: "linear", repeat: Infinity } }}
+      />
+      {/* Barrido: una línea recorre la zona cada vez que se activa */}
+      <AnimatePresence>
+        {on && ambient && (
+          <motion.rect
+            key={active ?? "none"}
+            x={rect.x}
+            y={rect.y}
+            width={vertical ? rect.width : 3}
+            height={vertical ? 3 : rect.height}
+            fill="var(--color-lime)"
+            initial={vertical ? { attrY: rect.y + rect.height, opacity: 1 } : { attrX: rect.x, opacity: 1 }}
+            animate={vertical ? { attrY: rect.y, opacity: [1, 1, 0] } : { attrX: rect.x + rect.width, opacity: [1, 1, 0] }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.9, ease: [0.25, 1, 0.5, 1] }}
+            pointerEvents="none"
+          />
+        )}
+      </AnimatePresence>
+      {/* Área de captura del puntero, también cuando la zona está apagada */}
+      <rect {...rect} fill="transparent" />
+    </g>
   );
 }
 
 // Andamio colgante que sube y baja por la línea de vida de la fachada.
 const SCAFFOLD_Y = [318, 120, 250, 318];
 
-function BuildingSection({ active }: { active: BuildingZone }) {
+function BuildingSection({ active, onPick }: { active: BuildingZone; onPick: (zone: BuildingZone) => void }) {
   const ambient = useAmbientMotion();
+  const pointer = useSvgPointer(ambient);
+  // Al recorrer la sección con scroll el corte sube un poco más lento que el texto.
+  const { scrollYProgress } = useScroll({ target: pointer.ref as unknown as RefObject<HTMLElement>, offset: ["start end", "end start"] });
+  const drift = useTransform(scrollYProgress, (v) => (ambient ? (0.5 - v) * 60 : 0));
+  const tiltX = useTransform(pointer.nx, (v) => (ambient ? v * 6 : 0));
   const { draw, fadeIn } = useDrawVariants(useReducedMotion() === true);
   const loop ={ duration: 14, times: [0, 0.4, 0.7, 1], ease: "easeInOut" as const, repeat: Infinity, delay: 1.5 };
 
   return (
-    <svg
+    <motion.svg
+      ref={pointer.ref}
+      {...pointer.handlers}
+      style={{ y: drift }}
       viewBox="0 18 440 524"
       preserveAspectRatio="xMidYMid meet"
       className="mx-auto h-auto w-full max-w-sm lg:absolute lg:inset-0 lg:h-full lg:max-w-none"
@@ -64,13 +121,15 @@ function BuildingSection({ active }: { active: BuildingZone }) {
     >
       <title id="corte-titulo">Corte esquemático de un edificio con las zonas de intervención destacadas</title>
 
+      <motion.g style={{ x: tiltX }}>
       {/* Zonas */}
-      <Zone zone="roof" active={active} x={48} y={40} width={324} height={44} />
-      <Zone zone="facade" active={active} x={352} y={84} width={40} height={356} />
-      <Zone zone="shaft" active={active} x={194} y={84} width={40} height={416} />
-      <Zone zone="ground" active={active} x={56} y={440} width={300} height={60} />
+      <Zone zone="roof" active={active} ambient={ambient} onPick={onPick} x={48} y={40} width={324} height={44} />
+      <Zone zone="facade" active={active} ambient={ambient} onPick={onPick} x={352} y={84} width={40} height={356} />
+      <Zone zone="shaft" active={active} ambient={ambient} onPick={onPick} x={194} y={84} width={40} height={416} />
+      <Zone zone="ground" active={active} ambient={ambient} onPick={onPick} x={56} y={440} width={300} height={60} />
 
       <motion.g
+        pointerEvents="none"
         fill="none"
         stroke="var(--color-mist)"
         strokeWidth="1.1"
@@ -139,7 +198,23 @@ function BuildingSection({ active }: { active: BuildingZone }) {
         <text x="64" y="534">ACCESO · ÁREAS COMUNES</text>
         <text x="236" y="76">SHAFT</text>
       </g>
-    </svg>
+      </motion.g>
+
+      {ambient && (
+        <Crosshair
+          x={pointer.x}
+          y={pointer.y}
+          on={pointer.on}
+          box={{ x: 0, y: 18, w: 440, h: 524 }}
+          color="var(--color-lime)"
+          textColor="var(--color-lime)"
+          readout={(px, py) => {
+            const n = ((500 - py) / 40) * 2.7;
+            return `EJE ${((px - 60) / 40 * 2.7).toFixed(2)} · N ${n >= 0 ? "+" : ""}${n.toFixed(2)} m`;
+          }}
+        />
+      )}
+    </motion.svg>
   );
 }
 
@@ -200,7 +275,13 @@ export function Buildings() {
 
         <div className="col-span-4 flex flex-col gap-5 lg:col-span-6">
           <div className="relative lg:min-h-[16rem] lg:flex-1">
-            <BuildingSection active={active.zone} />
+            <BuildingSection
+              active={active.zone}
+              onPick={(zone) => {
+                const match = buildingCapabilities.find((c) => c.zone === zone);
+                if (match) setActiveId(match.id);
+              }}
+            />
           </div>
           <div className="min-h-24 border-l-2 border-lime pl-5" aria-live="polite">
               <AnimatePresence mode="wait">

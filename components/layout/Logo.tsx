@@ -9,7 +9,7 @@ export function Logo({ variant = "horizontal", className = "h-10", priority = fa
   return (
     <Image
       src={logo.src}
-      alt="SALHEN Ingeniería y Construcción"
+      alt="SALHEN"
       width={logo.width}
       height={logo.height}
       priority={priority}

@@ -3,7 +3,7 @@
 import { motion } from "motion/react";
 
 const lines = [
-  { text: "Tu propiedad.", tone: "text-ink" },
+  { text: "Edificios.", tone: "text-ink" },
   { text: "En buenas manos.", tone: "text-olive" },
 ];
 
