@@ -106,7 +106,7 @@ export function Passport() {
   const next = passportItems.filter((i) => i.status === "desarrollo");
 
   return (
-    <section id="pasaporte" aria-labelledby="pasaporte-titulo" className="bg-paper-2 py-20 lg:py-16">
+    <section id="pasaporte" aria-labelledby="pasaporte-titulo" className="bg-paper-2 py-14 sm:py-20 lg:py-16">
       <div className="shell grid-12 gap-y-12">
         <div className="col-span-4 flex flex-col gap-7 lg:col-span-6">
           <SectionHead

@@ -8,7 +8,7 @@ export function Footer() {
   const { email, phone } = siteConfig.contact;
   return (
     <footer className="on-dark bg-graphite text-mist">
-      <div className="shell grid-12 gap-y-14 py-20">
+      <div className="shell grid-12 gap-y-10 py-14 sm:gap-y-14 sm:py-20">
         <div className="col-span-4 flex flex-col gap-6 lg:col-span-4">
           <Logo variant="verticalBlanco" className="h-32 self-start" />
           <p className="max-w-xs text-[0.95rem] leading-relaxed">
@@ -79,7 +79,7 @@ export function Footer() {
         </div>
       </div>
       <div className="border-t border-graphite-line">
-        <div className="shell flex flex-col gap-2 py-6 text-[0.85rem] sm:flex-row sm:justify-between">
+        <div className="shell flex flex-col gap-2 pb-24 pt-6 text-[0.85rem] sm:flex-row sm:justify-between sm:py-6">
           <p>© {new Date().getFullYear()} SALHEN. Santiago, Chile.</p>
           <p>Los trabajos son ejecutados por especialistas de la red SALHEN.</p>
         </div>

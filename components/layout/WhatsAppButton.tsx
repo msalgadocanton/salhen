@@ -99,7 +99,7 @@ export function WhatsAppButton() {
                 {showBubble && (
                   <motion.span
                     aria-hidden="true"
-                    className="absolute right-[calc(100%+0.85rem)] top-1/2 flex -translate-y-1/2 items-center gap-2.5 whitespace-nowrap border border-ink/80 bg-paper py-2 pl-3 pr-4 shadow-[0_10px_30px_-14px_rgb(0_0_0/0.55)]"
+                    className="absolute right-[calc(100%+0.85rem)] top-1/2 flex -translate-y-1/2 max-sm:hidden items-center gap-2.5 whitespace-nowrap border border-ink/80 bg-paper py-2 pl-3 pr-4 shadow-[0_10px_30px_-14px_rgb(0_0_0/0.55)]"
                     initial={{ opacity: 0, x: 12, scale: 0.92 }}
                     animate={{ opacity: 1, x: 0, scale: 1 }}
                     exit={{ opacity: 0, x: 8, scale: 0.95 }}

@@ -1,7 +1,7 @@
 "use client";
 
-import { useMemo, useState, type RefObject } from "react";
-import { AnimatePresence, motion, useReducedMotion, useScroll, useTransform, type Variants } from "motion/react";
+import { useMemo, useState } from "react";
+import { AnimatePresence, motion, useReducedMotion, type Variants } from "motion/react";
 import { useAmbientMotion } from "@/components/motion/useAmbientMotion";
 import { useSvgPointer } from "@/components/motion/useSvgPointer";
 import { Crosshair } from "@/components/motion/Crosshair";
@@ -58,7 +58,7 @@ function Zone({
         {...rect}
         fill="var(--color-lime)"
         initial={false}
-        animate={on ? { fillOpacity: [0.65, 0.22] } : { fillOpacity: 0 }}
+        animate={on ? { fillOpacity: [active === "all" ? 0.3 : 0.6, active === "all" ? 0.1 : 0.22] } : { fillOpacity: 0 }}
         transition={{ duration: 0.7, ease: "easeOut" }}
       />
       <motion.rect
@@ -101,27 +101,22 @@ const SCAFFOLD_Y = [318, 120, 250, 318];
 function BuildingSection({ active, onPick }: { active: BuildingZone; onPick: (zone: BuildingZone) => void }) {
   const ambient = useAmbientMotion();
   const pointer = useSvgPointer(ambient);
-  // Al recorrer la sección con scroll el corte sube un poco más lento que el texto.
-  const { scrollYProgress } = useScroll({ target: pointer.ref as unknown as RefObject<HTMLElement>, offset: ["start end", "end start"] });
-  const drift = useTransform(scrollYProgress, (v) => (ambient ? (0.5 - v) * 60 : 0));
-  const tiltX = useTransform(pointer.nx, (v) => (ambient ? v * 6 : 0));
   const { draw, fadeIn } = useDrawVariants(useReducedMotion() === true);
   const loop ={ duration: 14, times: [0, 0.4, 0.7, 1], ease: "easeInOut" as const, repeat: Infinity, delay: 1.5 };
 
   return (
-    <motion.svg
+    <svg
       ref={pointer.ref}
       {...pointer.handlers}
-      style={{ y: drift }}
       viewBox="0 18 440 524"
       preserveAspectRatio="xMidYMid meet"
-      className="mx-auto h-auto w-full max-w-sm lg:absolute lg:inset-0 lg:h-full lg:max-w-none"
+      className="mx-auto block h-auto w-full max-w-xs lg:absolute lg:inset-0 lg:h-full lg:max-w-none"
       role="img"
       aria-labelledby="corte-titulo"
     >
       <title id="corte-titulo">Corte esquemático de un edificio con las zonas de intervención destacadas</title>
 
-      <motion.g style={{ x: tiltX }}>
+      <g>
       {/* Zonas */}
       <Zone zone="roof" active={active} ambient={ambient} onPick={onPick} x={48} y={40} width={324} height={44} />
       <Zone zone="facade" active={active} ambient={ambient} onPick={onPick} x={352} y={84} width={40} height={356} />
@@ -198,7 +193,7 @@ function BuildingSection({ active, onPick }: { active: BuildingZone; onPick: (zo
         <text x="64" y="534">ACCESO · ÁREAS COMUNES</text>
         <text x="236" y="76">SHAFT</text>
       </g>
-      </motion.g>
+      </g>
 
       {ambient && (
         <Crosshair
@@ -214,7 +209,7 @@ function BuildingSection({ active, onPick }: { active: BuildingZone; onPick: (zo
           }}
         />
       )}
-    </motion.svg>
+    </svg>
   );
 }
 
@@ -223,11 +218,12 @@ export function Buildings() {
   const active = buildingCapabilities.find((c) => c.id === activeId) ?? buildingCapabilities[0];
 
   return (
-    // Pensada para verse completa en una pantalla de escritorio: dos columnas simétricas, el corte
-    // ocupa la altura de la columna de texto y la franja inferior cierra la lámina.
-    <section id="edificios" aria-labelledby="edificios-titulo" className="on-dark blueprint-dark relative bg-graphite py-20 text-paper lg:py-16">
-      <div className="shell grid-12 gap-y-12 lg:gap-y-10">
-        <div className="col-span-4 flex flex-col gap-7 lg:col-span-6">
+    // Lámina simétrica: dos columnas iguales que arrancan y terminan a la misma altura. A la izquierda
+    // el encabezado y las capacidades; a la derecha el corte enmarcado con su descripción. Abajo,
+    // tres columnas con la misma estructura (etiqueta + contenido).
+    <section id="edificios" aria-labelledby="edificios-titulo" className="on-dark blueprint-dark relative bg-graphite py-14 sm:py-20 text-paper lg:py-24">
+      <div className="shell grid-12 gap-y-12 lg:items-stretch lg:gap-y-14">
+        <div className="col-span-4 flex flex-col gap-8 lg:col-span-6">
           <SectionHead
             dark
             index="03"
@@ -243,10 +239,10 @@ export function Buildings() {
             organiza, supervisa y entrega cada trabajo documentado.
           </p>
 
-          <div>
+          <div className="mt-auto">
             <p className="label mb-3 text-mist">Elige una capacidad para ver dónde interviene</p>
             <ul className="border-t border-graphite-line">
-              {buildingCapabilities.map((c) => {
+              {buildingCapabilities.map((c, i) => {
                 const isActive = c.id === activeId;
                 return (
                   <li key={c.id} className="border-b border-graphite-line">
@@ -256,11 +252,12 @@ export function Buildings() {
                       onClick={() => setActiveId(c.id)}
                       onMouseEnter={() => setActiveId(c.id)}
                       onFocus={() => setActiveId(c.id)}
-                      className={`flex min-h-11 w-full items-center justify-between gap-4 py-2 text-left font-display text-[1.2rem] font-medium uppercase tracking-wide transition-colors ${
+                      className={`flex min-h-12 w-full items-center gap-4 py-2 text-left font-display text-[1.15rem] font-medium uppercase tracking-wide transition-colors ${
                         isActive ? "text-lime" : "text-paper hover:text-lime"
                       }`}
                     >
-                      {c.label}
+                      <span className={`label w-6 shrink-0 ${isActive ? "text-lime" : "text-mist"}`}>{String(i + 1).padStart(2, "0")}</span>
+                      <span className="flex-1">{c.label}</span>
                       <span
                         aria-hidden="true"
                         className={`h-2 w-2 shrink-0 transition-[background-color,transform] duration-300 ${isActive ? "scale-100 bg-lime" : "scale-50 bg-graphite-line"}`}
@@ -273,46 +270,56 @@ export function Buildings() {
           </div>
         </div>
 
-        <div className="col-span-4 flex flex-col gap-5 lg:col-span-6">
-          <div className="relative lg:min-h-[16rem] lg:flex-1">
-            <BuildingSection
-              active={active.zone}
-              onPick={(zone) => {
-                const match = buildingCapabilities.find((c) => c.zone === zone);
-                if (match) setActiveId(match.id);
-              }}
-            />
+        <div className="col-span-4 flex flex-col border border-graphite-line bg-graphite/60 lg:col-span-6">
+          <div className="label flex items-center justify-between gap-4 border-b border-graphite-line px-5 py-3 text-mist">
+            <span>Corte esquemático</span>
+            <span className="text-right text-lime">{active.label}</span>
           </div>
-          <div className="min-h-24 border-l-2 border-lime pl-5" aria-live="polite">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={active.id}
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -8 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <p className="label text-lime">{active.label}</p>
-                  <p className="mt-2 text-[0.95rem] text-mist">{active.text}</p>
-                </motion.div>
-              </AnimatePresence>
+          <div className="relative px-6 py-6 lg:min-h-[22rem] lg:flex-1">
+            <div className="relative h-full w-full">
+              <BuildingSection
+                active={active.zone}
+                onPick={(zone) => {
+                  const match = buildingCapabilities.find((c) => c.zone === zone);
+                  if (match) setActiveId(match.id);
+                }}
+              />
+            </div>
+          </div>
+          <div className="min-h-28 border-t border-graphite-line px-5 py-4" aria-live="polite">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={active.id}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.3 }}
+              >
+                <p className="label text-lime">{active.label}</p>
+                <p className="mt-2 text-[0.95rem] leading-relaxed text-mist">{active.text}</p>
+              </motion.div>
+            </AnimatePresence>
           </div>
         </div>
 
-        <div className="col-span-4 grid grid-cols-1 items-center gap-8 border-t border-graphite-line pt-8 lg:col-span-12 lg:grid-cols-12 lg:gap-6">
-          <div className="lg:col-span-4">
+        <div className="col-span-4 grid grid-cols-1 gap-8 border-t border-graphite-line pt-8 sm:grid-cols-3 sm:gap-6 lg:col-span-12">
+          <div>
             <p className="label mb-3 text-mist">Trabajamos con</p>
-            <ul className="flex flex-col gap-0.5 text-[0.95rem] text-paper">
+            <ul className="flex flex-col gap-1 text-[0.95rem] text-paper">
               {audiences.map((a) => (
                 <li key={a}>{a}</li>
               ))}
             </ul>
           </div>
-          <p className="text-[0.95rem] text-mist lg:col-span-4">
-            SALHEN no administra edificios. Trabajamos junto a la administración y el comité como proveedor técnico de
-            mantención y reparaciones.
-          </p>
-          <div className="lg:col-span-4 lg:justify-self-end">
+          <div>
+            <p className="label mb-3 text-mist">Nuestro rol</p>
+            <p className="text-[0.95rem] leading-relaxed text-paper">
+              SALHEN no administra edificios. Trabajamos junto a la administración y el comité como proveedor técnico de
+              mantención y reparaciones.
+            </p>
+          </div>
+          <div>
+            <p className="label mb-3 text-mist">Siguiente paso</p>
             <ButtonLink href="/?tipo=edificio#cotizar" variant="lime">
               Solicitar evaluación para mi edificio
             </ButtonLink>

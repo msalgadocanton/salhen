@@ -44,7 +44,7 @@ export function Header() {
         animate={{ y: hidden ? "-100%" : "0%" }}
         transition={{ duration: 0.45, ease: [0.25, 1, 0.5, 1] }}
         className={`fixed inset-x-0 top-0 z-40 pt-[calc(env(safe-area-inset-top,0px)+0.75rem)] pb-2 lg:pt-[calc(env(safe-area-inset-top,0px)+1.25rem)] transition-[background-color,border-color] duration-300 ${
-          solid && !open ? "border-b border-line bg-paper/92 backdrop-blur-md" : "border-b border-transparent"
+          solid || open ? "border-b border-line bg-paper/95 backdrop-blur-md" : "border-b border-transparent"
         }`}
       >
         <div className="shell grid h-18 grid-cols-[1fr_auto] items-center gap-6 xl:grid-cols-[1fr_auto_1fr]">
@@ -97,52 +97,67 @@ export function Header() {
 
       <AnimatePresence>
         {open && (
-          <motion.div
-            id="menu-movil"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Menú"
-            className="blueprint fixed inset-0 z-30 overflow-y-auto bg-paper pt-[calc(env(safe-area-inset-top,0px)+6.5rem)] pb-[max(2rem,env(safe-area-inset-bottom,0px))] xl:hidden"
-            initial={{ clipPath: "inset(0 0 100% 0)" }}
-            animate={{ clipPath: "inset(0 0 0% 0)" }}
-            exit={{ clipPath: "inset(0 0 100% 0)" }}
-            transition={{ duration: 0.6, ease: [0.83, 0, 0.17, 1] }}
-          >
-            <nav aria-label="Menú móvil" className="shell flex min-h-full flex-col justify-between gap-12">
-              <ul className="flex flex-col">
-                {navigation.map((item, i) => (
-                  <motion.li
-                    key={item.href}
-                    initial={{ opacity: 0, y: 28 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.25 + i * 0.05, duration: 0.5, ease: [0.25, 1, 0.5, 1] }}
-                    className="border-b border-line"
-                  >
-                    <Link
-                      ref={i === 0 ? firstLink : undefined}
-                      href={item.href}
-                      onClick={() => setOpen(false)}
-                      className="flex items-baseline justify-between gap-4 py-4 font-display text-[clamp(2rem,8vw,3.2rem)] font-semibold uppercase leading-none text-ink transition-colors hover:text-olive-ink"
+          <>
+            {/* Fondo atenuado: tocarlo cierra el menú */}
+            <motion.div
+              aria-hidden="true"
+              className="fixed inset-0 z-30 bg-ink/45 backdrop-blur-[2px] xl:hidden"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              onClick={() => setOpen(false)}
+            />
+            {/* Panel compacto bajo la cabecera: enlaces en una grilla simétrica de 2 × 3 */}
+            <motion.div
+              id="menu-movil"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Menú"
+              className="blueprint fixed inset-x-4 z-40 max-h-[calc(100dvh-7rem)] overflow-y-auto border border-ink/80 bg-paper p-4 shadow-[0_24px_48px_-20px_rgb(0_0_0/0.5)] sm:inset-x-auto sm:right-6 sm:w-[26rem] xl:hidden"
+              style={{ top: "calc(env(safe-area-inset-top, 0px) + 5.75rem)" }}
+              initial={{ opacity: 0, y: -12, scale: 0.97 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -8, scale: 0.98 }}
+              transition={{ duration: 0.28, ease: [0.25, 1, 0.5, 1] }}
+            >
+              <nav aria-label="Menú móvil" className="flex flex-col gap-4">
+                <ul className="grid grid-cols-2 gap-2">
+                  {navigation.map((item, i) => (
+                    <motion.li
+                      key={item.href}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.06 + i * 0.035, duration: 0.3, ease: [0.25, 1, 0.5, 1] }}
                     >
-                      {item.label}
-                      <span className="label text-olive-ink">0{i + 1}</span>
-                    </Link>
-                  </motion.li>
-                ))}
-              </ul>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.6 }}
-                className="flex flex-col gap-6"
-              >
-                <ButtonLink href="/#cotizar" variant="lime" onClick={() => setOpen(false)} className="w-full sm:w-auto">
-                  Solicitar cotización
-                </ButtonLink>
-                <p className="label text-ink-2">Cobertura inicial · {siteConfig.coverage.join(" · ")}</p>
-              </motion.div>
-            </nav>
-          </motion.div>
+                      <Link
+                        ref={i === 0 ? firstLink : undefined}
+                        href={item.href}
+                        onClick={() => setOpen(false)}
+                        className="flex h-full min-h-[4.25rem] flex-col justify-between gap-1 border border-line bg-paper/90 px-3 py-2.5 transition-colors hover:border-ink active:bg-lime"
+                      >
+                        <span className="label text-[0.65rem] text-olive-ink">0{i + 1}</span>
+                        <span className="font-display text-[1.05rem] font-semibold uppercase leading-tight tracking-wide text-ink">
+                          {item.label}
+                        </span>
+                      </Link>
+                    </motion.li>
+                  ))}
+                </ul>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.25 }}
+                  className="flex flex-col gap-3"
+                >
+                  <ButtonLink href="/#cotizar" variant="lime" onClick={() => setOpen(false)} className="w-full justify-center">
+                    Solicitar cotización
+                  </ButtonLink>
+                  <p className="label text-center text-[0.65rem] text-ink-2">Cobertura · {siteConfig.coverage.join(" · ")}</p>
+                </motion.div>
+              </nav>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </>

@@ -4,7 +4,7 @@ import { SectionHead } from "@/components/ui/SectionHead";
 // Índice técnico de servicios. <details> mantiene la apertura accesible por teclado sin JS.
 export function ServicesIndex() {
   return (
-    <section id="servicios" aria-labelledby="servicios-titulo" className="bg-paper-2 py-20 lg:py-16">
+    <section id="servicios" aria-labelledby="servicios-titulo" className="bg-paper-2 py-14 sm:py-20 lg:py-16">
       <div className="shell">
         <div className="grid-12 mb-10 gap-y-6">
           <SectionHead

@@ -6,7 +6,7 @@ import { Logo } from "@/components/layout/Logo";
 
 export function ValueProposition() {
   return (
-    <section aria-labelledby="propuesta" className="py-20 lg:py-16">
+    <section aria-labelledby="propuesta" className="py-14 sm:py-20 lg:py-16">
       <div className="shell grid-12 gap-y-12 lg:gap-y-10">
         <div className="col-span-4 flex flex-col gap-7 lg:col-span-6">
           <SectionHead

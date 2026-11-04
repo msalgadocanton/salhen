@@ -1,6 +1,6 @@
 "use client";
 
-import type { CSSProperties, ReactNode, RefObject } from "react";
+import { useEffect, useState, type CSSProperties, type ReactNode, type RefObject } from "react";
 import { AnimatePresence, MotionConfig, motion, useScroll, useTransform, type MotionValue } from "motion/react";
 import { useAmbientMotion } from "@/components/motion/useAmbientMotion";
 import { useSvgPointer } from "@/components/motion/useSvgPointer";
@@ -92,12 +92,27 @@ function EffectSlot({ active, layer, rep, force, play }: { active: string | null
 }
 
 // play cambia con cada clic en un servicio y reinicia su efecto aunque ya estuviera activo.
+// En pantallas angostas los textos de los marcadores se ocultan: el encuadre se ajusta para que
+// el edificio (x 150–450) quede centrado.
+function useWide() {
+  const [wide, setWide] = useState(true);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 640px)");
+    const update = () => setWide(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+  return wide;
+}
+
 export function HeroDrawing({ active = null, force = false, play = 0 }: { active?: string | null; force?: boolean; play?: number }) {
   const floors = Array.from({ length: FLOORS }, (_, i) => TOP + i * FLOOR_H);
   const ambient = useAmbientMotion();
   const pointer = useSvgPointer(ambient);
   // Los efectos de servicio se repiten siempre que se muestren a la fuerza (recorrido del hero).
   const rep = ambient || force ? Infinity : 0;
+  const wide = useWide();
 
   // 0 mientras el croquis está en pantalla completa; avanza a 1 a medida que sale por arriba.
   const { scrollYProgress } = useScroll({ target: pointer.ref as unknown as RefObject<HTMLElement>, offset: ["start start", "end start"] });
@@ -111,7 +126,7 @@ export function HeroDrawing({ active = null, force = false, play = 0 }: { active
       {...pointer.handlers}
       // Encuadre ajustado al dibujo: arriba la sala de máquinas, abajo la etiqueta S-01 y a la
       // derecha el texto de los marcadores, para que el croquis calce con la columna de texto.
-      viewBox="0 12 690 506"
+      viewBox={wide ? "0 12 690 506" : "-10 12 620 506"}
       preserveAspectRatio="xMidYMid meet"
       role="img"
       aria-labelledby="hero-drawing-title"

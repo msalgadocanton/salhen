@@ -10,19 +10,19 @@ import { HeroTitle } from "./HeroTitle";
 // (HeroShowcase envuelve la grilla porque comparte el servicio activo entre ambos).
 export function Hero() {
   return (
-    <section aria-labelledby="hero-heading" className="blueprint relative overflow-hidden pt-[calc(env(safe-area-inset-top,0px)+7.5rem)] lg:pt-40">
+    <section aria-labelledby="hero-heading" className="blueprint relative overflow-hidden pt-[calc(env(safe-area-inset-top,0px)+6.75rem)] sm:pt-[calc(env(safe-area-inset-top,0px)+7.5rem)] lg:pt-40">
       <div className="shell">
-        <div className="label mb-8 flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-b border-line pb-4 text-ink-2 lg:mb-14">
-          <p>Mantención · Reparación · Soluciones constructivas</p>
+        <div className="label mb-6 flex flex-wrap items-center justify-between gap-x-6 gap-y-1 border-b border-line pb-3 text-ink-2 max-sm:text-[0.62rem] max-sm:tracking-[0.05em] sm:mb-8 sm:gap-y-2 sm:pb-4 lg:mb-14">
+          <p className="whitespace-nowrap">Mantención · Reparación · Soluciones constructivas</p>
           <p className="flex items-center gap-2">
             <span aria-hidden="true" className="h-2 w-2 bg-lime ring-1 ring-ink/40" />
             Santiago · Sector oriente
           </p>
         </div>
 
-        <HeroShowcase>
-          <div className="col-span-4 flex flex-col justify-between gap-10 lg:col-span-6">
-            <HeroTitle />
+        <HeroShowcase
+          title={<HeroTitle />}
+          body={
             <Reveal delay={0.5} className="flex flex-col gap-7">
               <p className="max-w-[32rem] text-[1.3rem] leading-snug text-ink lg:text-[1.4rem]">
                 Soluciones integrales en mantención, reparación y trabajos especializados para edificios, empresas y hogares.
@@ -39,8 +39,8 @@ export function Hero() {
                 </ButtonLink>
               </div>
             </Reveal>
-          </div>
-        </HeroShowcase>
+          }
+        />
       </div>
 
       <div className="mt-10 border-t-4 border-lime bg-paper/70">

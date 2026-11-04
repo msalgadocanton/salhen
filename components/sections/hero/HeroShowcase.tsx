@@ -10,6 +10,8 @@ import { CYCLE } from "./heroGeometry";
 // Los servicios avanzan solos cada CYCLE segundos (2 s); al elegir uno queda fijo hasta 8 s sin
 // interacción. Por decisión de diseño este recorrido corre también con movimiento reducido
 // (la mira y la profundidad con el mouse sí lo respetan).
+// En móvil el croquis va centrado entre el titular y el texto, y en vez de las tarjetas de
+// servicios se muestra solo el nombre del servicio que el edificio está representando.
 
 const ORDER = ["S-05", "S-01", "S-02", "S-04", "S-03", "S-06", "S-07", "S-08"];
 const items = ORDER.map((code) => services.find((s) => s.code === code)).filter((s): s is (typeof services)[number] => Boolean(s));
@@ -17,7 +19,7 @@ const items = ORDER.map((code) => services.find((s) => s.code === code)).filter(
 const START_DELAY = 2600; // deja terminar el trazado inicial del dibujo
 const RESUME_AFTER = 8000;
 
-export function HeroShowcase({ children }: { children: ReactNode }) {
+export function HeroShowcase({ title, body }: { title: ReactNode; body: ReactNode }) {
   const [index, setIndex] = useState(0);
   const [started, setStarted] = useState(false);
   const [auto, setAuto] = useState(true);
@@ -52,14 +54,33 @@ export function HeroShowcase({ children }: { children: ReactNode }) {
 
   return (
     <>
-      <div className="grid-12 gap-y-12">
-        {children}
-        <div className="relative col-span-4 lg:col-span-6">
+      {/* Móvil: titular → croquis → texto. Escritorio: texto a la izquierda (titular arriba, cuerpo
+          abajo) y croquis a la derecha ocupando ambas filas. */}
+      <div className="grid-12 gap-y-8 lg:gap-y-10">
+        <div className="col-span-4 lg:col-span-6 lg:col-start-1 lg:row-start-1">{title}</div>
+        <div className="relative col-span-4 lg:col-span-6 lg:col-start-7 lg:row-span-2 lg:row-start-1">
           <HeroDrawing active={started ? current.code : null} force play={play} />
+          <div className="mt-3 flex min-h-6 justify-center sm:hidden" aria-hidden="true">
+            <AnimatePresence mode="wait" initial={false}>
+              {started && (
+                <motion.p
+                  key={current.code}
+                  className="label text-center text-ink"
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -6 }}
+                  transition={{ duration: 0.25 }}
+                >
+                  <span className="text-olive-ink">{current.code}</span> · {current.name}
+                </motion.p>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
+        <div className="col-span-4 lg:col-span-6 lg:col-start-1 lg:row-start-2 lg:self-end">{body}</div>
       </div>
 
-      <div className="mt-10 border-t border-line pt-5">
+      <div className="mt-10 hidden border-t border-line pt-5 sm:block">
         <div className="label mb-3 flex flex-wrap items-center justify-between gap-x-6 gap-y-1">
           <p className="text-ink-2">Elige un servicio para verlo en el edificio</p>
           <p className="text-stone">Ilustración técnica de referencia</p>

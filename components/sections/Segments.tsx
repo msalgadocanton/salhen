@@ -8,7 +8,7 @@ const homeServiceCodes = ["S-01", "S-02", "S-05", "S-03", "S-04", "S-07", "S-06"
 
 export function Business() {
   return (
-    <section id="empresas" aria-labelledby="empresas-titulo" className="py-20 lg:py-16">
+    <section id="empresas" aria-labelledby="empresas-titulo" className="py-14 sm:py-20 lg:py-16">
       <div className="shell grid-12 gap-y-12">
         <div className="col-span-4 flex flex-col gap-7 lg:col-span-6">
           <SectionHead
@@ -61,7 +61,7 @@ export function Homes() {
     .filter((s) => s !== undefined);
 
   return (
-    <section id="hogares" aria-labelledby="hogares-titulo" className="on-dark relative overflow-hidden bg-olive-ink py-20 text-paper lg:py-16">
+    <section id="hogares" aria-labelledby="hogares-titulo" className="on-dark relative overflow-hidden bg-olive-ink py-14 sm:py-20 text-paper lg:py-16">
       <div className="shell grid-12 gap-y-12">
         <div className="col-span-4 flex flex-col gap-7 lg:col-span-6">
           <SectionHead

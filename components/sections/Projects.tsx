@@ -66,7 +66,7 @@ function EmptyState() {
 
 export function Projects() {
   return (
-    <section id="proyectos" aria-labelledby="proyectos-titulo" className="bg-paper-2 py-20 lg:py-16">
+    <section id="proyectos" aria-labelledby="proyectos-titulo" className="bg-paper-2 py-14 sm:py-20 lg:py-16">
       <div className="shell flex flex-col gap-10">
         <SectionHead index="08" eyebrow="Portafolio" title={<span id="proyectos-titulo">Proyectos realizados</span>} />
         {projects.length > 0 ? (

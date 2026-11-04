@@ -5,7 +5,7 @@ import { siteConfig, whatsappHref } from "@/lib/site";
 export function QuoteSection() {
   const wa = whatsappHref("Hola SALHEN, quiero solicitar una evaluación.");
   return (
-    <section id="cotizar" aria-labelledby="cotizar-titulo" className="py-20 lg:py-16">
+    <section id="cotizar" aria-labelledby="cotizar-titulo" className="py-14 sm:py-20 lg:py-16">
       <div className="shell grid-12 gap-y-12">
         <div className="col-span-4 flex flex-col gap-7 lg:col-span-6">
           <div className="lg:sticky lg:top-28 lg:flex lg:flex-col lg:gap-7">
