@@ -110,7 +110,7 @@ function BuildingSection({ active, onPick }: { active: BuildingZone; onPick: (zo
       {...pointer.handlers}
       viewBox="0 18 440 524"
       preserveAspectRatio="xMidYMid meet"
-      className="mx-auto block h-auto w-full max-w-xs lg:absolute lg:inset-0 lg:h-full lg:max-w-none"
+      className="absolute inset-0 block h-full w-full"
       role="img"
       aria-labelledby="corte-titulo"
     >
@@ -130,7 +130,7 @@ function BuildingSection({ active, onPick }: { active: BuildingZone; onPick: (zo
         strokeWidth="1.1"
         initial="hidden"
         whileInView="show"
-        viewport={{ once: true, amount: 0.3 }}
+        viewport={{ once: true, amount: 0.1 }}
       >
         {/* Terreno, envolvente y antepecho */}
         <motion.path variants={draw} custom={0} d="M10 500 H430" strokeWidth="1.4" />
@@ -272,11 +272,12 @@ export function Buildings() {
 
         <div className="col-span-4 flex flex-col border border-graphite-line bg-graphite/60 lg:col-span-6">
           <div className="label flex items-center justify-between gap-4 border-b border-graphite-line px-5 py-3 text-mist">
-            <span>Corte esquemático</span>
+            <span className="whitespace-nowrap">Corte esquemático</span>
             <span className="text-right text-lime">{active.label}</span>
           </div>
           <div className="relative px-6 py-6 lg:min-h-[22rem] lg:flex-1">
-            <div className="relative h-full w-full">
+            {/* Proporción fija en móvil (Safari no calcula bien el alto automático del SVG aquí) */}
+            <div className="relative mx-auto aspect-[440/524] w-full max-w-xs lg:aspect-auto lg:h-full lg:max-w-none">
               <BuildingSection
                 active={active.zone}
                 onPick={(zone) => {
