@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion, type Variants } from "motion/react";
+import { AnimatePresence, motion, useInView, useReducedMotion, type Variants } from "motion/react";
 import { useAmbientMotion } from "@/components/motion/useAmbientMotion";
 import { useSvgPointer } from "@/components/motion/useSvgPointer";
 import { Crosshair } from "@/components/motion/Crosshair";
@@ -102,6 +102,9 @@ function BuildingSection({ active, onPick }: { active: BuildingZone; onPick: (zo
   const ambient = useAmbientMotion();
   const pointer = useSvgPointer(ambient);
   const { draw, fadeIn } = useDrawVariants(useReducedMotion() === true);
+  // Se observa el <svg> completo: Safari (iOS) no detecta la entrada en pantalla de un <g> interno,
+  // y con whileInView en el grupo el edificio nunca se dibujaba en iPhone.
+  const inView = useInView(pointer.ref, { once: true, amount: 0.1 });
   const loop ={ duration: 14, times: [0, 0.4, 0.7, 1], ease: "easeInOut" as const, repeat: Infinity, delay: 1.5 };
 
   return (
@@ -129,8 +132,7 @@ function BuildingSection({ active, onPick }: { active: BuildingZone; onPick: (zo
         stroke="var(--color-mist)"
         strokeWidth="1.1"
         initial="hidden"
-        whileInView="show"
-        viewport={{ once: true, amount: 0.1 }}
+        animate={inView ? "show" : "hidden"}
       >
         {/* Terreno, envolvente y antepecho */}
         <motion.path variants={draw} custom={0} d="M10 500 H430" strokeWidth="1.4" />

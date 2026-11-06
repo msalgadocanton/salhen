@@ -1,5 +1,5 @@
-// Configuración central del sitio. Los datos de contacto vienen solo de variables de
-// entorno: si no están definidos, el sitio no los muestra (no se inventan).
+// Configuración central del sitio. Los datos de contacto vienen de variables de
+// entorno (si no están definidos, el sitio no los muestra); WhatsApp trae el número oficial por defecto.
 
 function clean(value: string | undefined) {
   const v = value?.trim();
@@ -17,7 +17,8 @@ export const siteConfig = {
   city: "Santiago",
   coverage: ["Las Condes", "Vitacura", "Providencia", "Lo Barnechea", "La Reina", "Ñuñoa"],
   contact: {
-    whatsapp: clean(process.env.NEXT_PUBLIC_WHATSAPP_NUMBER),
+    // Número oficial entregado por el cliente (06-11-2026); la variable de entorno lo puede reemplazar.
+    whatsapp: clean(process.env.NEXT_PUBLIC_WHATSAPP_NUMBER) ?? "56961288461",
     email: clean(process.env.NEXT_PUBLIC_CONTACT_EMAIL),
     phone: clean(process.env.NEXT_PUBLIC_CONTACT_PHONE),
   },
